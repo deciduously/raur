@@ -1,0 +1,12 @@
+[package]
+name = "raur"
+version = "0.1.0"
+authors = ["deciduously <bendlovy@gmail.com>"]
+
+[dependencies]
+clippy = {version = "*", optional = true}
+hyper = "0.9"
+
+[features]
+default = []
+dev = ["clippy"]
