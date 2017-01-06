@@ -4,6 +4,7 @@ version = "0.1.0"
 authors = ["deciduously <bendlovy@gmail.com>"]
 
 [dependencies]
+clap = "~2.19.0"
 clippy = {version = "*", optional = true}
 hyper = "0.9"
 
