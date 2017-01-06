@@ -5,6 +5,8 @@
 extern crate clap;
 extern crate raur;
 
+use std::env;
+
 fn main() {
     let matches = clap_app!(raur =>
         (version: "0.1.0")
@@ -13,6 +15,7 @@ fn main() {
         (@arg DOWNLOAD: -d --download +takes_value "Downloads the selected package to your build folder")
         (@arg SEARCH: -s --search +takes_value "Searches AUR for given package and returns info")
     ).get_matches();
-        
-    println!("doing thing on {}", matches.value_of("DOWNLOAD").unwrap());
+    let package = matches.value_of("DOWNLOAD").unwrap();
+    println!("doing thing on {}", package);
+    println!("{}", raur::download_package(package, &mut env::home_dir().unwrap()).unwrap());
 }
