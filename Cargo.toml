@@ -7,6 +7,7 @@ authors = ["deciduously <bendlovy@gmail.com>"]
 clap = "~2.19.0"
 clippy = {version = "*", optional = true}
 hyper = "0.9"
+toml = "0.2"
 
 [features]
 default = []

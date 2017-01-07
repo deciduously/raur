@@ -3,7 +3,7 @@ extern crate hyper;
 
 use hyper::client;
 use std::error::Error;
-// use std::env;
+use std::env;
 use std::fs::File;
 use std::io::prelude::*;
 
@@ -33,13 +33,14 @@ use std::io::prelude::*;
 // }
 //
 
-//downloads given package to given destination, returns a Result with the length of the file written
-pub fn download_package(name: &str, dest: &mut std::path::PathBuf) -> Result<usize, &'static str> {
+// downloads given package to given destination, returns a Result with the length of the file written
+pub fn download_package(name: &str, dest: std::path::PathBuf) -> Result<usize, &'static str> {
     let url = "https://aur.archlinux.org/cgit/aur.git/snapshot/";
     let file_str = format!("{}.tar.gz", name);
-    dest.push(file_str);
-    let display = dest.display();
-    let mut file = match File::create(&dest) {
+    let mut file_path = dest;
+    file_path.push(&file_str);
+    let display = file_path.display();
+    let mut file = match File::create(&file_path) {
         Err(reason) => {
             println!("could not create {}: {}", display, reason.description());
             return Err("could not create file");
@@ -47,7 +48,7 @@ pub fn download_package(name: &str, dest: &mut std::path::PathBuf) -> Result<usi
         Ok(file) => file,
     };
 
-    let query = format!("{}{}.tar.gz", url, name);
+    let query = format!("{}{}", url, &file_str);
     let client = client::Client::new();
 
     let mut res = client.get(&query).send().unwrap();
@@ -56,7 +57,7 @@ pub fn download_package(name: &str, dest: &mut std::path::PathBuf) -> Result<usi
 
     match file.write_all(&bytes) {
         Err(reason) => {
-          println!("could not create {}: {}", display, reason.description());
+            println!("could not create {}: {}", display, reason.description());
             Err("could not create file")
         }
         Ok(_) => {
@@ -86,9 +87,7 @@ pub fn download_package(name: &str, dest: &mut std::path::PathBuf) -> Result<usi
 mod tests {
     use super::*;
     #[test]
-    fn name_works() {
-        use hyper::status;
-        // assert_eq!(search_by_name("cower").maintainer, "falconindy");
-        assert_eq!(download_package("cower", &mut env::home_dir().unwrap()), Ok(871));
+    fn get_url_works() {
+        // assert_eq!(get_url("cower", "download"), "https://aur.archlinux.org/cgit/aur.git/snapshot/cower.tar.gz");
     }
 }
