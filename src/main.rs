@@ -28,12 +28,11 @@ fn main() {
         get_default_config()
     };
 
-    let config = config::Config::new(config_path);
+    let config = config::Config::new(&config_path);
 
     let package = matches.value_of("DOWNLOAD").unwrap();
     println!("{}",
              raur::download_package(package, config.raur_root).unwrap());
-
 }
 
 fn get_default_config() -> std::path::PathBuf {
