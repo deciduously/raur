@@ -6,6 +6,8 @@ use std::error::Error;
 use std::env;
 use std::fs::File;
 use std::io::prelude::*;
+use std::path::*;
+use std::process::Command;
 
 // pub struct PackageInfo {
 // name: &'static str,
@@ -31,10 +33,9 @@ use std::io::prelude::*;
 // }
 // }
 // }
-//
 
-// downloads given package to given destination, returns a Result with the length of the file written
-pub fn download_package(name: &str, dest: std::path::PathBuf) -> Result<usize, &'static str> {
+// downloads given package to given destination, returns a Result with the path of the file written
+pub fn download_package(name: &str, dest: PathBuf) -> Result<PathBuf, &'static str> {
     let url = "https://aur.archlinux.org/cgit/aur.git/snapshot/";
     let file_str = format!("{}.tar.gz", name);
     let mut file_path = dest;
@@ -62,8 +63,19 @@ pub fn download_package(name: &str, dest: std::path::PathBuf) -> Result<usize, &
         }
         Ok(_) => {
             println!("successfully wrote to {}", display);
-            Ok(len)
+            Ok(PathBuf::from(file_path.as_os_str()))
         }
+    }
+}
+
+pub fn install_package(package: &str, loc: PathBuf) -> Result<PathBuf, &'static str> {
+    let path = match download_package(package, PathBuf::from(loc.as_os_str())) {
+        Ok(path) => path,
+        Err(e) => panic!(e),
+    };
+    match untar_package(path.to_path_buf()) {
+        Ok(_) => Ok(PathBuf::from(loc.as_os_str())),
+        Err(_) => Err("could not untar"),
     }
 }
 
@@ -81,7 +93,18 @@ pub fn download_package(name: &str, dest: std::path::PathBuf) -> Result<usize, &
 // println!("{}", result);
 //
 // }
-//
+
+fn untar_package(archive: PathBuf) -> Result<PathBuf, &'static str> {
+    let untar = Command::new("tar")
+        .current_dir(archive.parent().unwrap())
+        .arg("xvf")
+        .arg(archive.file_name().unwrap())
+        .output()
+        .expect("could not untar package archive");
+    println!("{}", untar.status);
+
+    Ok(archive)
+}
 
 #[cfg(test)]
 mod tests {

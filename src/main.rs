@@ -18,6 +18,7 @@ fn main() {
         (about: "Simple CLI AUR helper")
         (@arg CONFIG: -c --config +takes_value "Specifies a config to use other than the default")
         (@arg DOWNLOAD: -d --download +takes_value "Downloads the selected package to your build folder")
+        (@arg INSTALL: -i --install +takes_value "Installs given package")
         (@arg SEARCH: -s --search +takes_value "Searches AUR for given package and returns info")
     ).get_matches();
 
@@ -30,9 +31,9 @@ fn main() {
 
     let config = config::Config::new(&config_path);
 
-    let package = matches.value_of("DOWNLOAD").unwrap();
+    let package = matches.value_of("INSTALL").unwrap();
     println!("{}",
-             raur::download_package(package, config.raur_root).unwrap());
+             raur::install_package(package, config.raur_root).unwrap().display());
 }
 
 fn get_default_config() -> std::path::PathBuf {
